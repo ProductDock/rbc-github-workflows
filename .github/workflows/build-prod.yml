@@ -42,6 +42,7 @@ jobs:
         with:
           workload_identity_provider: 'projects/${{ secrets.WORKLOAD_IDENTITY_PROVIDER_ID }}/locations/global/workloadIdentityPools/rbc-github-pool/providers/${{ secrets.WORKLOAD_IDENTITY_PROVIDER }}'
           service_account: ${{ secrets.SERVICE_ACCOUNT }}
+          audience: ${{ secrets.WORKLOAD_IDENTITY_AUD }}
 
       - name: 'Set up Cloud SDK'
         uses: google-github-actions/setup-gcloud@v0
