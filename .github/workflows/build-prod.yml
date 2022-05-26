@@ -60,7 +60,7 @@ jobs:
         if: ${{ !inputs.docker-database-build-arg }}
         run: |-
           docker build --build-arg ACTIVE_PROFILE=prod --tag "$DOCKER_IMAGE_NAME:$VERSION" .
-          docker build ACTIVE_PROFILE=local --tag "$DOCKER_IMAGE_NAME:local_latest" .
+          docker build --build-arg ACTIVE_PROFILE=local --tag "$DOCKER_IMAGE_NAME:local_latest" .
 
       - name: 'Publish docker image'
         run: |-
