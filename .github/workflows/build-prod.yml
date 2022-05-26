@@ -6,7 +6,10 @@ on:
       update-script:
         required: true
         type: string
-      docker-build-args:
+      docker-build-arg-name:
+        required: false
+        type: string
+      docker-build-arg-value:
         required: false
         type: string
 
@@ -51,7 +54,7 @@ jobs:
 
       - name: 'Build docker image with Version tag'
         run: |-
-          docker build ${{ inputs.docker-build-args }} --build-arg ACTIVE_PROFILE=prod --tag "$DOCKER_IMAGE_NAME:$VERSION" .
+          docker build ${{ inputs.docker-build-arg-name }}${{ inputs.docker-build-arg-value }} --build-arg ACTIVE_PROFILE=prod --tag "$DOCKER_IMAGE_NAME:$VERSION" .
 
       - name: 'Publish docker image'
         run: |-
