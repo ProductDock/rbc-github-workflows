@@ -54,15 +54,18 @@ jobs:
         if: ${{ inputs.docker-database-build-arg }}
         run: |-
           docker build --build-arg PASSWORD=${{ secrets.DATABASE_PASSWORD }} --build-arg ACTIVE_PROFILE=prod --tag "$DOCKER_IMAGE_NAME:$VERSION" .
+          docker build --build-arg PASSWORD=root --build-arg ACTIVE_PROFILE=local --tag "$DOCKER_IMAGE_NAME:local_latest" .
           
       - name: 'Build docker image with Version tag'
         if: ${{ !inputs.docker-database-build-arg }}
         run: |-
           docker build --build-arg ACTIVE_PROFILE=prod --tag "$DOCKER_IMAGE_NAME:$VERSION" .
+          docker build --build-arg ACTIVE_PROFILE=local --tag "$DOCKER_IMAGE_NAME:local_latest" .
 
       - name: 'Publish docker image'
         run: |-
           docker push "$DOCKER_IMAGE_NAME:$VERSION"
+          docker push "$DOCKER_IMAGE_NAME:local_latest"
 
       - name: 'Deploy Docker image to Compute engine'
         run: |-
