@@ -6,12 +6,10 @@ on:
       update-script:
         required: true
         type: string
-      docker-build-arg-name:
+      docker-database-build-arg:
         required: false
-        type: string
-      docker-build-arg-value:
-        required: false
-        type: string
+        default: false
+        type: boolean
 
 env:
   DOCKER_IMAGE_NAME: gcr.io/${{ secrets.GCE_PROJECT }}/${{ github.event.repository.name }}
@@ -52,9 +50,15 @@ jobs:
       - run: |-
           gcloud auth configure-docker
 
-      - name: 'Build docker image with Version tag'
+      - name: 'Build docker image with database password and Version tag'
+        if: ${{ inputs.docker-database-build-arg == 'true' }}
         run: |-
-          docker build ${{ inputs.docker-build-arg-name }}${{ inputs.docker-build-arg-value }} --build-arg ACTIVE_PROFILE=prod --tag "$DOCKER_IMAGE_NAME:$VERSION" .
+          docker build --build-arg PASSWORD=${{ secrets.DATABASE_PASSWORD }} --build-arg ACTIVE_PROFILE=prod --tag "$DOCKER_IMAGE_NAME:$VERSION" .
+          
+      - name: 'Build docker image with Version tag'
+        if: ${{ inputs.docker-database-build-arg == 'false' }}
+        run: |-
+          docker build --build-arg ACTIVE_PROFILE=prod --tag "$DOCKER_IMAGE_NAME:$VERSION" .
 
       - name: 'Publish docker image'
         run: |-
