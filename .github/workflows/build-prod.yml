@@ -70,3 +70,11 @@ jobs:
       - name: 'Deploy Docker image to Compute engine'
         run: |-
           gcloud compute ssh --project=${{ secrets.GCE_PROJECT }} --zone=$GCE_INSTANCE_ZONE --ssh-key-expire-after=5m --command="bash ${{ inputs.update-script }} $VERSION" $GCE_INSTANCE
+
+      - name: 'Sleep for 1 minute'
+        run: sleep 1m
+        shell: bash
+
+      - name: 'Check are all docker containers running'
+        run: |-
+          gcloud compute ssh --project=${{ secrets.GCE_PROJECT }} --zone=$GCE_INSTANCE_ZONE --ssh-key-expire-after=5m --command="bash sudo docker ps -a" $GCE_INSTANCE
