@@ -77,4 +77,4 @@ jobs:
 
       - name: 'Check are all docker containers running'
         run: |-
-          gcloud compute ssh --project=${{ secrets.GCE_PROJECT }} --zone=$GCE_INSTANCE_ZONE --ssh-key-expire-after=5m --command="bash sudo docker ps -a" $GCE_INSTANCE
+          gcloud compute ssh --project=${{ secrets.GCE_PROJECT }} --zone=$GCE_INSTANCE_ZONE --ssh-key-expire-after=5m --command="sudo docker ps -a" $GCE_INSTANCE
