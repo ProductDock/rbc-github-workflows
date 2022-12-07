@@ -49,10 +49,11 @@ jobs:
       - name: 'Build docker image with Version tag'
         run: |-
           docker build --tag "$DOCKER_IMAGE_NAME:$VERSION" .
+          docker build --tag "$DOCKER_IMAGE_NAME:latest" .
 
       - name: 'Publish docker image'
         run: |-
-          docker push "$DOCKER_IMAGE_NAME:$VERSION"
+          docker push --all-tags
 
       - name: 'Deploy Docker image to Compute engine'
         run: |-
