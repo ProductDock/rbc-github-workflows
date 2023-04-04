@@ -1,4 +1,4 @@
-name: Build and Deploy Production
+name: Build and upload to container registry
 
 on:
   workflow_call:
@@ -9,20 +9,18 @@ on:
 
 env:
   DOCKER_IMAGE_NAME: gcr.io/${{ secrets.GCE_PROJECT }}/${{ github.event.repository.name }}
-  GCE_INSTANCE: prod-pd-library-services
-  GCE_INSTANCE_ZONE: europe-west3-c
 
 jobs:
-  setup-build-publish-deploy:
+  setup-build-publish:
     name: Build Production Job
     runs-on: ubuntu-latest
 
     permissions:
-      contents: 'read'
-      id-token: 'write'
+      contents: "read"
+      id-token: "write"
 
     steps:
-      - name: 'Get version from tag name'
+      - name: "Get version from tag name"
         id: get_version
         run: |
           version=${GITHUB_REF/refs\/tags\//}
@@ -34,27 +32,23 @@ jobs:
           fetch-depth: 0
 
       - id: auth_to_gcp
-        name: 'Authenticate to Google Cloud'
-        uses: 'google-github-actions/auth@v0'
+        name: "Authenticate to Google Cloud"
+        uses: "google-github-actions/auth@v0"
         with:
-          workload_identity_provider: 'projects/${{ secrets.WORKLOAD_IDENTITY_PROVIDER_ID }}/locations/global/workloadIdentityPools/rbc-github-pool/providers/${{ secrets.WORKLOAD_IDENTITY_PROVIDER }}'
+          workload_identity_provider: "projects/${{ secrets.WORKLOAD_IDENTITY_PROVIDER_ID }}/locations/global/workloadIdentityPools/rbc-github-pool/providers/${{ secrets.WORKLOAD_IDENTITY_PROVIDER }}"
           service_account: ${{ secrets.SERVICE_ACCOUNT }}
           audience: ${{ secrets.WORKLOAD_IDENTITY_AUD }}
 
-      - name: 'Set up Cloud SDK'
+      - name: "Set up Cloud SDK"
         uses: google-github-actions/setup-gcloud@v0
       - run: |-
           gcloud auth configure-docker
-          
-      - name: 'Build docker image with Version tag'
+
+      - name: "Build docker image with Version tag"
         run: |-
           docker build --tag "$DOCKER_IMAGE_NAME:$VERSION" .
           docker build --tag "$DOCKER_IMAGE_NAME:latest" .
 
-      - name: 'Publish docker image'
+      - name: "Publish docker image"
         run: |-
           docker push "$DOCKER_IMAGE_NAME" --all-tags
-
-      - name: 'Deploy Docker image to Compute engine'
-        run: |-
-          gcloud compute ssh --project=${{ secrets.GCE_PROJECT }} --zone=$GCE_INSTANCE_ZONE --ssh-key-expire-after=5m --command="bash ${{ inputs.update-script }} $VERSION" $GCE_INSTANCE
