@@ -2,10 +2,6 @@ name: Build and upload to container registry
 
 on:
   workflow_call:
-    inputs:
-      update-script:
-        required: true
-        type: string
 
 env:
   DOCKER_IMAGE_NAME: gcr.io/${{ secrets.GCE_PROJECT }}/${{ github.event.repository.name }}
